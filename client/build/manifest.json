@@ -1,0 +1,10 @@
+{
+  "short_name": "Il Forno",
+  "name": "Il Forno di Mattia",
+  "icons": [
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#8b4513",
+  "background_color": "#fffacd"
+}

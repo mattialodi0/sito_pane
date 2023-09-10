@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  body {
+    @apply bg-secondary;
+  }
+
+  /* titles */
+  h1,
+  h2,
+  h3 {
+    @apply text-primary text-center font-bold;
+  }
+
+  h1 {
+    @apply m-5 text-5xl;
+  }
+
+  h2 {
+    @apply m-4 text-4xl;
+  }
+
+  h3 {
+    @apply m-3 text-3xl;
+  }
+
+  /* header */
+  header {
+    @apply mb-5 px-5 flex flex-row justify-between items-center w-full border-b-2 border-primary;
+  }
+
+  header a {
+    @apply text-inherit;
+  }
+
+  header a.logo {
+    @apply mx-2 my-2 text-primary text-lg font-bold;
+  }
+  
+  header a.notifications, 
+  header a.orders, 
+  header a.dashboard {
+    @apply mx-2 text-primary text-base;
+  }
+
+  header nav {
+    @apply flex gap-4 lg:gap-8;
+  }
+
+  header .btn-login,
+  header .btn-register,
+  header .btn-logout {
+    @apply my-5 px-2 py-1 text-primary border border-primary rounded-md;
+  }
+
+  /*form */
+  .btn-back {
+    @apply m-5 px-2 py-1 text-primary border border-primary rounded-md absolute;
+  }
+
+  .login,
+  .register {
+    @apply flex flex-col items-center;
+  }
+
+  form input,
+  form select {
+    @apply m-1 p-1 border bg-secondary border-primary rounded-md;
+  }
+
+  form button {
+    @apply m-3 px-2 py-1 text-white bg-primary border rounded-md;
+  }
+
+  .btn-empty {
+    @apply my-5 px-2 py-1 text-primary border border-primary rounded-md bg-secondary hover:bg-secondary-dark;
+  }
+
+  .btn-full {
+    @apply my-5 px-2 py-1 text-white border border-primary rounded-md bg-primary hover:bg-primary-dark;
+  }
+
+  /* personal page */
+  .personal>*,
+  .admin>* {
+    @apply flex flex-col items-center;
+  }
+
+  .card {
+    @apply p-2 border-2 border-primary rounded-md shadow-md shadow-amber-600/50;
+  }
+}
