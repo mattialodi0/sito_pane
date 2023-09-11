@@ -12,18 +12,18 @@ export default function Header() {
     const [newNotifs, setNewNotifs] = useState([]);
 
     useEffect(() => {
-        // fetch(ServerUrl.url+'/profile', {
-        //     credentials: 'include',
-        //     method: 'GET'
-        // }).then(
-        //     response => {
-        //         response.json().then(userInfo => {
-        //             setUserInfo(userInfo);
-        //         });
-        //     }
-        // );
+        fetch(ServerUrl.url + '/profile', {
+            credentials: 'include',
+            method: 'GET'
+        }).then(
+            response => {
+                response.json().then(userInfo => {
+                    setUserInfo(userInfo);
+                });
+            }
+        );
         if (userInfo.username) {
-            fetch(ServerUrl.url+'/notification/new', {
+            fetch(ServerUrl.url + '/notification/new', {
                 credentials: 'include',
                 method: 'GET'
             }).then(
@@ -34,11 +34,11 @@ export default function Header() {
                 }
             );
         }
-    }, [userInfo.username]);
+    }, []);     //userInfo.username
 
     function logout() {
         setUserInfo(null);
-        fetch(ServerUrl.url+'/logout', {
+        fetch(ServerUrl.url + '/logout', {
             method: 'POST',
             credentials: 'include'
         })

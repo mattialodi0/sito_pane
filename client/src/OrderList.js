@@ -9,9 +9,7 @@ export default function OrderList(props) {
     return (
         <div className="grid grid-cols-1 md:flex md:justify-between">
             {orders.length === 0 && (
-                <div className="m-10 flex justify-center w-1/12">
-                    <Loader />
-                </div>
+                <p className="m-5">Non ci sono ancora ordini</p>
             )}
             {orders.length !== 0 && (
                 <>

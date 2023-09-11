@@ -53,8 +53,8 @@ export default function ProductList() {
 
     return (
         <div className="h-full relative">
+            <h2>I nostri prodotti</h2>
             {products.length === 0 && (<p className="h-[51vh]">Al momento non ci sono prodotti disponibili</p>)}
-            {products.length > 0 && (<h2>I nostri prodotti</h2>)}
             <div className='flex justify-evenly items-center grow-0 shrink-0 flex-wrap'>
                 {products.length > 0 && products.displayProd((p) => (
                     <Product {...p} key={products.indexOf(p)} />

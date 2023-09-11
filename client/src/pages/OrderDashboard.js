@@ -11,6 +11,8 @@ export default function OrderDashboard() {
     const [orderStatus, setOrderStatus] = useState('order');
 
     const [orderModal, setOrderModal] = useState(false);
+    const [delElId, setDelElId] = useState(0);
+
 
     useEffect(() => {
         if (admin) {
@@ -19,7 +21,7 @@ export default function OrderDashboard() {
     }, [orderStatus]);
 
     function retriveOrders() {
-        fetch(ServerUrl.url+`/${orderStatus}`, { credentials: 'include' })
+        fetch(ServerUrl.url + `/${orderStatus}`, { credentials: 'include' })
             .then(response => {
                 if (response.status === 400) {
                     alert("Non sei un amministratore");
@@ -34,10 +36,11 @@ export default function OrderDashboard() {
             })
     }
 
-    async function deleteOrder(ev, id) {
+    async function deleteOrder(ev) {
         ev.preventDefault();
+        setOrderModal(false);
 
-        const response = await fetch(ServerUrl.url+`/order/${id}`, {
+        const response = await fetch(ServerUrl.url + `/order/${delElId}`, {
             method: 'DELETE',
             credentials: 'include',
         });
@@ -50,8 +53,9 @@ export default function OrderDashboard() {
 
     async function markOrder(ev, id) {
         ev.preventDefault();
-
-        const response = await fetch(ServerUrl.url+`/order/${id}/mark`, {
+        setOrderModal(false);
+        
+        const response = await fetch(ServerUrl.url + `/order/${id}/mark`, {
             method: 'PUT',
             credentials: 'include',
         });
@@ -76,13 +80,13 @@ export default function OrderDashboard() {
                     <option className="hover:bg-primary" value={'marked-order'}>{'solo evasi'}</option>
                 </select>
                 <div className="md:w-1/2 mx-auto">
-                    <OrderList order={orders} deleteOrder={() => setOrderModal(true)} markOrder={markOrder} />
+                    <OrderList order={orders} deleteOrder={(e,id) => {setOrderModal(true); setDelElId(id)}} markOrder={markOrder} />
                     {orderModal && (<DefaultModal content={(
                         <div>
                             <p className="text-base leading-relaxed text-gray-800 dark:text-gray-200">Vuoi davvero cancellare questo ordine?</p>
                             <p className="text-sm leading-relaxed text-gray-800 dark:text-gray-200">Poi non sarà più possibile ripristinarlo</p>
                         </div>
-                    )} confirm={deleteOrder} cancel={() => setOrderModal(false)} />)}
+                    )} confirm={deleteOrder} cancel={() => {setOrderModal(false); setDelElId(0); }} />)}
                 </div>
             </div>
         </>

@@ -17,14 +17,15 @@ export default function NotificationPage() {
     }, [notifsType])
 
     async function markAsRead(id) {
-        const response = await fetch(ServerUrl.url+`/order/${id}/notification`, {
+        const response = await fetch(ServerUrl.url+`/${id}/notification`, {
             method: 'PUT',
             credentials: 'include',
         });
-        // const j = await response.json();
         if (response.ok) {
             window.location.reload(false);
         }
+        else    
+            alert(`si è verificato un problema`);
     }
 
     return (
@@ -41,7 +42,8 @@ export default function NotificationPage() {
                     <p>Non ci sono notifiche</p>
                 )}
                 {notifs.length > 0 && notifs.map(n => (
-                    <Notification n={{id:n._id, title:n.title, content:n.content, date:n.date}} markAsRead={markAsRead} key={notifs.indexOf(n)} />
+                    <Notification n={{id:n.id, title:n.title, content:n.content, date:n.date}} 
+                        markAsRead={markAsRead} btnOn={notifsType == 'notification/new'} key={notifs.indexOf(n)} />
                 ))}
             </div>
         </div>

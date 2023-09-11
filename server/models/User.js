@@ -5,7 +5,7 @@ const UserSchema = new Schema({
     username: {type:String, required:true, min:4, unique:true},
     password: {type:String, required:true},
     admin: Boolean,
-    norifications:{type:Object},
+    notifications:{type:[Object]},
 })  
 
 const UserModel = model('User', UserSchema);

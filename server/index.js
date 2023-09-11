@@ -12,9 +12,11 @@ const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const uploadMiddleware = multer({ dest: './uploads/' });
 const fs = require('fs');
+// const uuidv4 = require("uuid/v4");
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'sdfklknwaeivow2i4ofmwp30';
+
 
 //middleware
 app.use(express.json());
@@ -65,7 +67,7 @@ app.post('/login', async (req, res) => {
 app.get('/profile', (req, res) => {
     const { token } = req.cookies;
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) { console.log('Err'); throw err; }
+        if (err) { console.log(err); }   //throw err;
         else res.json(info);
     });
 });
@@ -116,20 +118,24 @@ app.put('/product', uploadMiddleware.single('file'), async (req, res) => {
         if (err) throw err;
         const { name, desc, price, hidden } = req.body;
         const productDoc = await Product.findOne({ name: name });
-        await Product.updateOne({ name: name }, {
-            desc: desc ? desc : productDoc.desc,
-            price: price ? price : productDoc.price,
-            imgSrc: newPath ? newPath : productDoc.imgSrc,
-            hidden: hidden ? hidden : productDoc.hidden,
-        });
-        res.json(productDoc);
+        if (productDoc) {
+            await Product.updateOne({ name: name }, {
+                desc: desc ? desc : productDoc.desc,
+                price: price ? price : productDoc.price,
+                imgSrc: newPath ? newPath : productDoc.imgSrc,
+                hidden: productDoc.hidden,  //hidden ? hidden :  per ora la visibilità non è settabile
+            });
+            res.json(productDoc);
+        }
+        else
+            res.status(400).json(`${name} non è un prodotto esistente`);
     });
 
 });
 
 app.get('/product', async (req, res) => {
     let valids = [];
-    const products = await Product.find();
+    const products = await Product.find({ hidden: false });
     let i = 0;
     for (i; i < products.length; i++) {
         if (!products[i].hidden) valids.push(products[i]);
@@ -149,8 +155,18 @@ app.get('/product/:name', async (req, res) => {
 app.delete('/product/:name', async (req, res) => {
     const { name } = req.params;
     //verifica dell'identità
+    const product = await Product.findOne({ name });
+    try {
+        fs.unlinkSync(product?.imgSrc);
+    }
+    catch (e) {
+        console.log(e);
+    }
+
     const productDoc = await Product.deleteOne({ name });
-    res.json(productDoc);
+    if(productDoc) 
+        res.json(productDoc);
+    else    res.status(500).send();
 });
 
 // ordini
@@ -301,45 +317,7 @@ app.post('/notification', multer().fields([]), async (req, res) => {
     const { token } = req.cookies;
     const { title, content, dest } = req.body;
     const date = new Date();
-
-    let name, id;
-    jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
-        name = info.username;
-        id = info._id;
-    });
-
-    if (dest != 'all') {
-        const userDoc = await User.findOne({ 'username': dest });
-        if (userDoc === null) {
-            res.status(411).send();
-        }
-        else {
-            const notificationDoc = await Notification.create({
-                dest,
-                title,
-                content,
-                date,
-                read: false,
-            });
-            res.json(notificationDoc);
-        }
-    }
-    else {
-        const notificationDoc = await Notification.create({
-            dest,
-            title,
-            content,
-            date,
-            read: false,
-        });
-        res.json(notificationDoc);
-    }
-})
-
-app.put('/order/:id/notification', async (req, res) => {
-    const { token } = req.cookies;
-    const { id } = req.params;
+    const id = Math.floor(Math.random()*1000000000); //uuidv4();
 
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) throw err;
@@ -348,11 +326,67 @@ app.put('/order/:id/notification', async (req, res) => {
             return
         }
     });
+    
     try {
-        let orders = await Notification.findByIdAndUpdate({ _id: id }, { read: true });
-        res.json(orders);
+        if (dest === 'all') {
+            const userDoc = await User.updateMany({}, { $push: { notifications: { id, title, content, dest, date, read: false } } });
+            if (userDoc) {
+                res.json(userDoc);
+            }
+            else {
+                res.status(404).send()
+            }
+        }
+        else if (dest === 'clients') {
+            const userDoc = await User.updateMany({ admin: false }, { $push: { notifications: { id, title, content, dest, date, read: false } } });
+            if (userDoc) {
+                res.json(userDoc);
+            }
+            else {
+                res.status(404).send()
+            }
+        }
+        else {
+            const userDoc = await User.updateOne({ username: dest }, { $push: { notifications: { id, title, content, dest, date, read: false } } });
+            if (userDoc) {
+                res.json(userDoc);
+            }
+            else {
+                res.status(404).send()
+            }
+        }
     } catch (e) {
         res.json(e);
+    }
+})
+
+app.put('/:id/notification', async (req, res) => {
+    const { token } = req.cookies;
+    const { id } = req.params;
+    let name;
+    
+    jwt.verify(token, secret, {}, (err, info) => {
+        if (err) throw err;
+        name = info.username;
+    });
+    try {
+        const userDoc = await User.findOneAndUpdate(
+            { username: name }, 
+            { $pull: { 'notifications': { 'id': id } } }
+        );
+        let notifications = userDoc.notifications;
+        for(let i=0; i<notifications.length; i++) {
+            if(notifications[i].id == id) {
+                notifications[i].read = true;
+            }
+        }
+        userDoc = await User.updateOne(
+            { username: name }, 
+            { $set: { 'notifications': notifications } }
+        );
+        res.json(userDoc);
+    } catch (e) {
+        res.status(500).json(e);
     }
 })
 
@@ -363,9 +397,12 @@ app.get('/notification', async (req, res) => {
         if (err) throw err;
         name = info.username;
     });
-    let notifications = await Notification.find({ dest: name });
-    notifications.push(...await Notification.find({ dest: 'all' }))
-    res.json(notifications);
+    let user = await User.findOne({ username: name });
+    if(user) {
+        res.json(user.notifications);
+    }
+    else
+        res.status(404).send();
 })
 
 app.get('/notification/new', async (req, res) => {
@@ -375,9 +412,15 @@ app.get('/notification/new', async (req, res) => {
         if (err) throw err;
         name = info.username;
     });
-    let notifications = await Notification.find({ dest: name, read: false });
-    notifications.push(...await Notification.find({ dest: 'all', read: false }));
-    res.json(notifications);
+    let user = await User.findOne({ username: name });
+    if (user) {
+        if (user.notifications.length > 0)
+            res.json(user.notifications.filter(n => n.read === false));
+        else
+            res.json([]);
+    }
+    else
+        res.status(404).send();
 })
 
 app.listen(4000, () => { console.log("listening on http://localhost:4000") });
