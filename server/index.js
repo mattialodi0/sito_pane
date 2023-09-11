@@ -30,6 +30,7 @@ mongoose.connect('mongodb+srv://mattyk0207:DChcpihwwYP1HVAm@cluster0.gwi3na7.mon
 // login & register
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
+    
     try {
         const userDoc = await User.create({
             username,
@@ -44,8 +45,8 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const userDoc = await User.findOne({ username: username });
 
+    const userDoc = await User.findOne({ username: username });
     if (userDoc != null) {
         const passOk = bcrypt.compareSync(password, userDoc.password);
         if (passOk) {
@@ -67,7 +68,7 @@ app.post('/login', async (req, res) => {
 app.get('/profile', (req, res) => {
     const { token } = req.cookies;
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) { console.log(err); }   //throw err;
+        if (err) res.status(400).json(err); // console.log(err);   //throw err;
         else res.json(info);
     });
 });
@@ -409,7 +410,7 @@ app.get('/notification/new', async (req, res) => {
     const { token } = req.cookies;
     let name;
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) res.status(400).json(err); //console.log(err); //throw err;
         name = info.username;
     });
     let user = await User.findOne({ username: name });
