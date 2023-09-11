@@ -318,7 +318,7 @@ app.post('/notification', multer().fields([]), async (req, res) => {
     const { token } = req.cookies;
     const { title, content, dest } = req.body;
     const date = new Date();
-    const id = Math.floor(Math.random()*1000000000); //uuidv4();
+    const id = Math.floor(Math.random()*1000000000);
 
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) throw err;
@@ -371,7 +371,7 @@ app.put('/:id/notification', async (req, res) => {
         name = info.username;
     });
     try {
-        const userDoc = await User.findOneAndUpdate(
+        let userDoc = await User.findOneAndUpdate(
             { username: name }, 
             { $pull: { 'notifications': { 'id': id } } }
         );
@@ -387,6 +387,7 @@ app.put('/:id/notification', async (req, res) => {
         );
         res.json(userDoc);
     } catch (e) {
+        console.log(e);
         res.status(500).json(e);
     }
 })
@@ -415,7 +416,7 @@ app.get('/notification/new', async (req, res) => {
     });
     let user = await User.findOne({ username: name });
     if (user) {
-        if (user.notifications.length > 0)
+        if (user.notifications)
             res.json(user.notifications.filter(n => n.read === false));
         else
             res.json([]);
