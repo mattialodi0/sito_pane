@@ -10,6 +10,7 @@ export default function ProductDashboard() {
     const [descc, setDescc] = useState('');
     const [pricec, setPricec] = useState('');
     const [filec, setFilec] = useState('');
+    const [urlc, setUrlc] = useState('');
     const [nameu, setNameu] = useState('');
     const [descu, setDescu] = useState('');
     const [priceu, setPriceu] = useState('');
@@ -34,13 +35,6 @@ export default function ProductDashboard() {
         }
     }, []);
 
-    useEffect(() => {
-        setNamed(JSON.parse(window.localStorage.getItem('named')));
-    }, []);
-    useEffect(() => { 
-        window.localStorage.setItem('named', JSON.stringify(named));
-    }, [named]);
-
     async function createProduct(ev) {
         ev.preventDefault();
 
@@ -49,6 +43,7 @@ export default function ProductDashboard() {
         data.set('desc', descc);
         data.set('price', Number(pricec));
         data.set('file', filec[0]);
+        data.set('url', urlc);
         data.set('hidden', false);
 
         const res = await fetch(ServerUrl.url + "/product", {
@@ -137,8 +132,11 @@ export default function ProductDashboard() {
                         value={descc}
                         onChange={ev => setDescc(ev.target.value)}
                     />
-                    <input type="file" placeholder="immagine" required className="bg-white"
+                    <input type="file" placeholder="immagine" className="bg-white"
                         onChange={ev => setFilec(ev.target.files)}
+                    />
+                    <input type="text" placeholder="url" className="bg-white"
+                        onChange={ev => setUrlc(ev.target.value)}
                     />
                     <button className="w-1/2 m-auto">aggiungi</button>
                 </div>

@@ -18,7 +18,7 @@ const secret = 'sdfklknwaeivow2i4ofmwp30';
 
 //middleware
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app"}));  //http://localhost:3000
+app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app" }));  //http://localhost:3000
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
@@ -29,7 +29,7 @@ mongoose.connect('mongodb+srv://mattyk0207:DChcpihwwYP1HVAm@cluster0.gwi3na7.mon
 // login & register
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
-    
+
     try {
         const userDoc = await User.create({
             username,
@@ -78,29 +78,50 @@ app.post('/logout', (req, res) => {
 
 // prodotti
 app.post('/product', uploadMiddleware.single('file'), async (req, res) => {
-    const { originalname, path } = req.file;
-    const parts = originalname.split('.');
-    const ext = parts[parts.length - 1];
-    const newPath = path + '.' + ext;
-    fs.renameSync(path, newPath);
+    if (req.file) {
+        const { originalname, path } = req.file;
+        const parts = originalname.split('.');
+        const ext = parts[parts.length - 1];
+        const newPath = path + '.' + ext;
+        fs.renameSync(path, newPath);
 
-    const { token } = req.cookies;
-    jwt.verify(token, secret, {}, async (err, info) => {
-        if (err) throw err;
-        const { name, desc, price, hidden } = req.body;
-        try {
-            const productDoc = await Product.create({
-                name,
-                desc,
-                price,
-                imgSrc: newPath,
-                hidden,
-            });
-            res.json(productDoc);
-        } catch (e) {
-            res.status(500).json(e);
-        }
-    });
+        const { token } = req.cookies;
+        jwt.verify(token, secret, {}, async (err, info) => {
+            if (err) throw err;
+            const { name, desc, price, hidden } = req.body;
+            try {
+                const productDoc = await Product.create({
+                    name,
+                    desc,
+                    price,
+                    imgSrc: newPath,
+                    hidden,
+                });
+                res.json(productDoc);
+            } catch (e) {
+                res.status(500).json(e);
+            }
+        });
+    }
+    else {
+        const { token } = req.cookies;
+        jwt.verify(token, secret, {}, async (err, info) => {
+            if (err) throw err;
+            const { name, desc, price, url, hidden } = req.body;
+            try {
+                const productDoc = await Product.create({
+                    name,
+                    desc,
+                    price,
+                    imgUrl: url,
+                    hidden,
+                });
+                res.json(productDoc);
+            } catch (e) {
+                res.status(500).json(e);
+            }
+        });
+    }
 });
 
 app.put('/product', uploadMiddleware.single('file'), async (req, res) => {
@@ -134,16 +155,8 @@ app.put('/product', uploadMiddleware.single('file'), async (req, res) => {
 });
 
 app.get('/product', async (req, res) => {
-    let valids = [];
     const products = await Product.find({ hidden: false });
-    let i = 0;
-    for (i; i < products.length; i++) {
-        if (!products[i].hidden) valids.push(products[i]);
-    }
-    res.json(
-        // products
-        valids
-    );
+    res.json(products);
 });
 
 app.get('/product/:name', async (req, res) => {
@@ -164,9 +177,9 @@ app.delete('/product/:name', async (req, res) => {
     }
 
     const productDoc = await Product.deleteOne({ name });
-    if(productDoc) 
+    if (productDoc)
         res.json(productDoc);
-    else    res.status(500).send();
+    else res.status(500).send();
 });
 
 // ordini
@@ -317,7 +330,7 @@ app.post('/notification', multer().fields([]), async (req, res) => {
     const { token } = req.cookies;
     const { title, content, dest } = req.body;
     const date = new Date();
-    const id = Math.floor(Math.random()*1000000000);
+    const id = Math.floor(Math.random() * 1000000000);
 
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) throw err;
@@ -326,7 +339,7 @@ app.post('/notification', multer().fields([]), async (req, res) => {
             return
         }
     });
-    
+
     try {
         if (dest === 'all') {
             const userDoc = await User.updateMany({}, { $push: { notifications: { id, title, content, dest, date, read: false } } });
@@ -364,24 +377,24 @@ app.put('/:id/notification', async (req, res) => {
     const { token } = req.cookies;
     const { id } = req.params;
     let name;
-    
+
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) throw err;
         name = info.username;
     });
     try {
         let userDoc = await User.findOneAndUpdate(
-            { username: name }, 
+            { username: name },
             { $pull: { 'notifications': { 'id': id } } }
         );
         let notifications = userDoc.notifications;
-        for(let i=0; i<notifications.length; i++) {
-            if(notifications[i].id == id) {
+        for (let i = 0; i < notifications.length; i++) {
+            if (notifications[i].id == id) {
                 notifications[i].read = true;
             }
         }
         userDoc = await User.updateOne(
-            { username: name }, 
+            { username: name },
             { $set: { 'notifications': notifications } }
         );
         res.json(userDoc);
@@ -399,7 +412,7 @@ app.get('/notification', async (req, res) => {
         name = info.username;
     });
     let user = await User.findOne({ username: name });
-    if(user) {
+    if (user) {
         res.json(user.notifications);
     }
     else

@@ -5,6 +5,7 @@ const ProductSchema = new Schema({
     name: {type:String, required:true, unique: true},
     desc: String,
     imgSrc: String,
+    imgUrl: String,
     price: {type:Number, required:true}, //in euro
     hidden: Boolean
 });
