@@ -110,6 +110,7 @@ export default function Header() {
                         </>
                     )}
                 </nav>
+                <p>{ServerUrl.url}</p>
             </header>
         </>
     )
