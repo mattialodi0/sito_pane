@@ -25,6 +25,11 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 //DB connection
 mongoose.connect('mongodb+srv://mattyk0207:DChcpihwwYP1HVAm@cluster0.gwi3na7.mongodb.net/');
 
+
+app.get('/', async (req, res) => {
+    res.json(hello);
+});
+
 // login & register
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
