@@ -12,16 +12,22 @@ export default function Header() {
     const [newNotifs, setNewNotifs] = useState([]);
 
     useEffect(() => {
-        fetch(ServerUrl.url + '/profile', {
-            credentials: 'include',
-            method: 'GET'
-        }).then(
-            response => {
-                response.json().then(userInfo => {
-                    setUserInfo(userInfo);
-                });
-            }
-        );
+        const info = localStorage.getItem('userInfo')
+        if (info)
+            setUserInfo(userInfo);
+        else {
+            fetch(ServerUrl.url + '/profile', {
+                credentials: 'include',
+                method: 'GET'
+            }).then(
+                response => {
+                    response.json().then(userInfo => {
+                        setUserInfo(userInfo);
+                        localStorage.setItem('userInfo', userInfo);
+                    });
+                }
+            );
+        }
         if (userInfo.username) {
             fetch(ServerUrl.url + '/notification/new', {
                 credentials: 'include',
