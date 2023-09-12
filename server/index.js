@@ -15,8 +15,10 @@ const fs = require('fs');
 const salt = bcrypt.genSaltSync(10);
 const secret = 'sdfklknwaeivow2i4ofmwp30';
 
-app.options('*', cors());
-//middleware
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://sito-pane-app.vercel.app:3000');
+    next();
+  });//middleware
 app.use(express.json());
 app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app:3000"}));  //http://localhost:3000
 app.use(cookieParser());
