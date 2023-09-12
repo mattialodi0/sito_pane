@@ -5,14 +5,12 @@ const mongoose = require("mongoose");
 const User = require('./models/User');
 const Product = require('./models/Product');
 const Order = require('./models/Order');
-// const Notification = require('./models/Notification');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 const uploadMiddleware = multer({ dest: './uploads/' });
 const fs = require('fs');
-// const uuidv4 = require("uuid/v4");
 
 const salt = bcrypt.genSaltSync(10);
 const secret = 'sdfklknwaeivow2i4ofmwp30';
