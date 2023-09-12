@@ -1,5 +1,6 @@
 {
     "buildCommand":"cd client && npm inatall && CI='' npm run build",
+     "outputDirectory":"client/dist",
     "rewrites":[
         {
             "source":"/server/(.*)",
