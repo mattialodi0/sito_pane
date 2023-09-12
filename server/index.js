@@ -18,13 +18,12 @@ const secret = 'sdfklknwaeivow2i4ofmwp30';
 
 //middleware
 app.use(express.json());
-app.use(cors());  //http://localhost:3000
+app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app:3000"}));  //http://localhost:3000
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
 //DB connection
 mongoose.connect('mongodb+srv://mattyk0207:DChcpihwwYP1HVAm@cluster0.gwi3na7.mongodb.net/');
-
 
 
 // login & register
