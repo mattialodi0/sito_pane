@@ -12,19 +12,6 @@ export default function Header() {
     const [newNotifs, setNewNotifs] = useState([]);
 
     useEffect(() => {
-
-        //     const jwt = localStorage.getItem('jwt')
-        //     fetch(ServerUrl.url + `/${jwt}/profile`, {
-        //         credentials: 'include',
-        //         method: 'GET'
-        //     }).then(
-        //         response => {
-        //             response.json().then(userInfo => {
-        //                 setUserInfo(userInfo);
-        //             });
-        //         }
-        //     );
-
         if (userInfo.username) {
             const jwt = localStorage.getItem('jwt')
             fetch(ServerUrl.url + `/${jwt}/notification/new`, {
@@ -38,7 +25,21 @@ export default function Header() {
                 }
             );
         }
-    }, []);     //userInfo.username
+    });
+
+    useEffect(() => {
+            const jwt = localStorage.getItem('jwt')
+            fetch(ServerUrl.url + `/${jwt}/profile`, {
+                credentials: 'include',
+                method: 'GET'
+            }).then(
+                response => {
+                    response.json().then(userInfo => {
+                        setUserInfo(userInfo);
+                    });
+                }
+            );
+    }, [userInfo]);
 
     function logout() {
         setUserInfo(null);

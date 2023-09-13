@@ -10,7 +10,6 @@ import ProductDashboard from './pages/ProductDashboard';
 import OrderDashboard from './pages/OrderDashboard';
 import NotificationDashboard from './pages/NotificationDashboard';
 
-
 function App() {  
   return (
     <UserContextProvider>
