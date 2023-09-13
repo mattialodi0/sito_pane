@@ -10,7 +10,7 @@ export default function IndexPage() {
     const { setUserInfo } = useContext(UserContext);
 
     async function login(ev) {
-        ev.preventDefault();
+        ev.preventDefault(); 
         const res = await fetch(ServerUrl.url+'/login', {
             method: 'POST',
             body: JSON.stringify({ username, password }),
@@ -22,6 +22,7 @@ export default function IndexPage() {
                 setUserInfo(info);
                 setRedirect(true);
             });
+            console.log(res.cookie);
         }
         else { alert('login failed') }
     }
