@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const http = require('http');
 const cors = require('cors');
 const mongoose = require("mongoose");
 const User = require('./models/User');
@@ -52,7 +53,8 @@ app.post('/login', async (req, res) => {
             // logged in
             jwt.sign({ username, id: userDoc._id, admin: userDoc.admin }, secret, {}, (err, token) => {
                 if (err) throw err;
-                res.cookie('token', token).json({
+                // res.cookie('token', token)
+                res.setHeader('Set-Cookie',[`token=${token}`]).json({
                     id: userDoc._id,
                     username,
                     admin: userDoc.admin,
@@ -404,7 +406,7 @@ app.put('/:id/notification', async (req, res) => {
     }
 })
 
-app.post('/notification', async (req, res) => {
+app.get('/notification', async (req, res) => {
     const { token } = req.cookies;
     let name;
     jwt.verify(token, secret, {}, (err, info) => {
@@ -419,7 +421,7 @@ app.post('/notification', async (req, res) => {
         res.status(404).send();
 })
 
-app.post('/notification/new', async (req, res) => {
+app.get('/notification/new', async (req, res) => {
     const { token } = req.cookies;
     let name;
     jwt.verify(token, secret, {}, (err, info) => {

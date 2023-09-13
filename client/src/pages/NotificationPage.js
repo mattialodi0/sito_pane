@@ -8,7 +8,7 @@ export default function NotificationPage() {
     const [notifsType, setNotifsType] = useState('notification/new');
 
     useEffect(() => {
-        fetch(ServerUrl.url+`/${notifsType}`, { credentials: 'include', method: 'POST' })
+        fetch(ServerUrl.url+`/${notifsType}`, { credentials: 'include', method: 'GET' })
             .then(response => {
                 response.json().then(n => {
                     setNotifs(n);
