@@ -23,7 +23,7 @@ export default function Personalpage() {
                         setProducts(products);
                     })
                 })
-            const jwt = sessionStorage.getItem('jwt')
+            const jwt = localStorage.getItem('jwt')
             await fetch(ServerUrl.url+`/${jwt}/user/order`, { credentials: 'include' })
                 .then(response => {
                     response.json().then(orders => {
@@ -84,7 +84,7 @@ export default function Personalpage() {
     async function submitOrder(ev) {
         let productsNames = formEl.map(f => f.selProd);
         let quantities = formEl.map(f => f.quantity);
-        const jwt = sessionStorage.getItem('jwt')
+        const jwt = localStorage.getItem('jwt')
         const res = await fetch(ServerUrl.url+`/${jwt}/order`, {
             method: 'POST',
             body: JSON.stringify({ productsNames, quantities, desc }),

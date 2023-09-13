@@ -12,25 +12,21 @@ export default function Header() {
     const [newNotifs, setNewNotifs] = useState([]);
 
     useEffect(() => {
-        const info = localStorage.getItem('userInfo')
-        if (info)
-            setUserInfo(userInfo);
-        else {
-            const jwt = sessionStorage.getItem('jwt')
-            fetch(ServerUrl.url +`/${jwt}/profile`, {
-                credentials: 'include',
-                method: 'GET'
-            }).then(
-                response => {
-                    response.json().then(userInfo => {
-                        setUserInfo(userInfo);
-                        localStorage.setItem('userInfo', userInfo);
-                    });
-                }
-            );
-        }
+
+        //     const jwt = localStorage.getItem('jwt')
+        //     fetch(ServerUrl.url + `/${jwt}/profile`, {
+        //         credentials: 'include',
+        //         method: 'GET'
+        //     }).then(
+        //         response => {
+        //             response.json().then(userInfo => {
+        //                 setUserInfo(userInfo);
+        //             });
+        //         }
+        //     );
+
         if (userInfo.username) {
-            const jwt = sessionStorage.getItem('jwt')
+            const jwt = localStorage.getItem('jwt')
             fetch(ServerUrl.url + `/${jwt}/notification/new`, {
                 credentials: 'include',
                 method: 'GET'
@@ -46,8 +42,8 @@ export default function Header() {
 
     function logout() {
         setUserInfo(null);
-        const jwt = sessionStorage.getItem('jwt')
-        sessionStorage.removeItem('jwt');
+        const jwt = localStorage.getItem('jwt')
+        localStorage.removeItem('jwt');
         fetch(ServerUrl.url + `/${jwt}/logout`, {
             method: 'POST',
             credentials: 'include'

@@ -8,7 +8,7 @@ export default function NotificationPage() {
     const [notifsType, setNotifsType] = useState('notification/new');
 
     useEffect(() => {
-        const jwt = sessionStorage.getItem('jwt')
+        const jwt = localStorage.getItem('jwt')
         fetch(ServerUrl.url + `/${jwt}/${notifsType}`, { credentials: 'include' })
             .then(response => {
                 response.json().then(n => {
@@ -18,7 +18,7 @@ export default function NotificationPage() {
     }, [notifsType])
 
     async function markAsRead(id) {
-        const jwt = sessionStorage.getItem('jwt')
+        const jwt = localStorage.getItem('jwt')
         const response = await fetch(ServerUrl.url + `/${jwt}/${id}/notification`, {
             method: 'PUT',
             credentials: 'include',

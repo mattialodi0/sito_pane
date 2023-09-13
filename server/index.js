@@ -19,7 +19,8 @@ const secret = 'sdfklknwaeivow2i4ofmwp30';
 
 //middleware
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app" }));  //http://localhost:3000
+app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app" }));   // per la produzione
+// app.use(cors({ credentials: true, origin: "http://localhost:3000" }));  // per il locale
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
@@ -180,7 +181,7 @@ app.get('/product/:name', async (req, res) => {
 });
 
 app.delete('/:token/product/:name', async (req, res) => {
-    const { name } = req.params;
+    const { token, name } = req.params;
     //verifica dell'identità
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) { 
@@ -188,7 +189,7 @@ app.delete('/:token/product/:name', async (req, res) => {
             return;
         }
         if(!info.admin) 
-            res.status(400).json("l'utente non è un amminisratore");
+            res.status(403).json("l'utente non è un amminisratore");
         username = info.username;
     });
 

@@ -22,7 +22,7 @@ export default function ProductDashboard() {
 
     useEffect(() => {
         if (admin) {
-            const jwt = sessionStorage.getItem('jwt')
+            const jwt = localStorage.getItem('jwt')
             fetch(ServerUrl.url+`/${jwt}/profile`, { credentials: 'include' })
             .then(response => {
                 if (response.status === 400) {
@@ -47,7 +47,7 @@ export default function ProductDashboard() {
         data.set('url', urlc);
         data.set('hidden', false);
 
-        const jwt = sessionStorage.getItem('jwt')
+        const jwt = localStorage.getItem('jwt')
         const res = await fetch(ServerUrl.url + `/${jwt}/product`, {
             method: 'POST',
             body: data,
@@ -81,7 +81,7 @@ export default function ProductDashboard() {
             data.set('file', fileu?.[0]);
         }
 
-        const jwt = sessionStorage.getItem('jwt')
+        const jwt = localStorage.getItem('jwt')
         const response = await fetch(ServerUrl.url + `/${jwt}/product`, {
             method: 'PUT',
             body: data,
@@ -97,9 +97,7 @@ export default function ProductDashboard() {
     }
 
     async function deleteProduct() {
-        console.log('n:', named);
-
-        const jwt = sessionStorage.getItem('jwt')
+        const jwt = localStorage.getItem('jwt')
         const response = await fetch(ServerUrl.url + `/${jwt}/product/${named}`, {
             method: 'DELETE',
             credentials: 'include',

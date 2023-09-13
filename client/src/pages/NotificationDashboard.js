@@ -8,7 +8,7 @@ export default function NotificationDashboard() {
 
     useEffect(() => {
         if (admin) {
-            const jwt = sessionStorage.getItem('jwt')
+            const jwt = localStorage.getItem('jwt')
             fetch(ServerUrl.url+`/${jwt}/profile`, { credentials: 'include' })
                 .then(response => {
                     if (response.status === 403) {
@@ -36,7 +36,7 @@ export default function NotificationDashboard() {
         else
             data.set('dest', newNotif.dest);
         
-        const jwt = sessionStorage.getItem('jwt')
+        const jwt = localStorage.getItem('jwt')
         const res = await fetch(ServerUrl.url+'/'+jwt+"/notification", {
             method: 'POST',
             body: data,
