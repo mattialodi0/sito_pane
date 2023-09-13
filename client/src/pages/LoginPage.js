@@ -33,7 +33,7 @@ export default function IndexPage() {
             <Navigate to={'/'} />
         )
     }
-    return (
+    else return (
         <>
             <Link to={'/'} className="btn-back"><button>back</button></Link>
             <form className="login" onSubmit={login}>

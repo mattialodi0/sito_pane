@@ -11,29 +11,49 @@ export default function RegisterPage() {
 
   async function register(ev) {
     ev.preventDefault();
+
+    if (!verifyCredentials()) {
+      return;
+    }
+
     const response = await fetch(ServerUrl.url + '/register', {
       method: 'POST',
       body: JSON.stringify({ username, password }),
       headers: { 'Content-Type': 'application/json' },
     });
-    const res = await fetch(ServerUrl.url + '/login', {
-      method: 'POST',
-      body: JSON.stringify({ username, password }),
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
-    });
-    if (res.status === 200) {
-      res.json().then(info => {
-        setUserInfo(info);
+    if (response.status === 200) {
+      const res = await fetch(ServerUrl.url + '/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password }),
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
       });
-    }
-    if (response.status === 200 && res.status === 200) {
+      if (res.status === 200) {
+        res.json().then(o => {
+          const { info, jwt } = o;
+          localStorage.setItem('jwt', jwt);
+          setUserInfo(info);
+        });
         alert('registration successful');
-        setRedirect(true);
+      }
+      setRedirect(true);
     } else {
       alert('registration failed');
     }
+  }
 
+  function verifyCredentials() {
+    if (username.length < 4)
+      alert('Il nome utente deve essere lungo al minimo 6 caratteri');
+    else if (password.length < 6)
+      alert('La password deve essere lunga al minimo 6 caratteri');
+    else if (username.length > 20)
+      alert('Il nome utente può essere lungo al massimo 20 caratteri');
+    else if (password.length < 6)
+      alert('La password può essere lunga al massimo 20 caratteri');
+    else 
+      return true;
+    return false;
   }
 
   if (redirect) {
@@ -41,7 +61,7 @@ export default function RegisterPage() {
       <Navigate to={'/'} />
     )
   }
-  return (
+  else return (
     <>
       <Link to={'/'} className="btn-back"><button>back</button></Link>
       <form className="register" onSubmit={register}>

@@ -13,6 +13,8 @@ const multer = require('multer');
 const uploadMiddleware = multer({ dest: './uploads/' });
 const fs = require('fs');
 
+const functions = require('./functions.js');
+
 const salt = bcrypt.genSaltSync(10);
 const secret = 'sdfklknwaeivow2i4ofmwp30';
 
@@ -37,6 +39,8 @@ app.post('/register', async (req, res) => {
             username,
             password: bcrypt.hashSync(password, salt),
             admin: "false",
+            notifications: [ functions.welcomeMessage(username) ],
+            stats: functions.createStats()
         });
         res.json(userDoc);
     } catch (e) {
@@ -47,7 +51,7 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
 
-    const userDoc = await User.findOne({ username: username });
+    const userDoc = await User.findOne({ username });
     if (userDoc != null) {
         const passOk = bcrypt.compareSync(password, userDoc.password);
         if (passOk) {
@@ -184,11 +188,11 @@ app.delete('/:token/product/:name', async (req, res) => {
     const { token, name } = req.params;
     //verifica dell'identità
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) { 
+        if (err) {
             res.status(403).json(err);
             return;
         }
-        if(!info.admin) 
+        if (!info.admin)
             res.status(403).json("l'utente non è un amminisratore");
         username = info.username;
     });
@@ -214,7 +218,7 @@ app.post('/:token/order', async (req, res) => {
     const { token } = req.params;
     let username = '';
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) { 
+        if (err) {
             res.status(403).json(err);
             return;
         }
@@ -355,13 +359,14 @@ app.put('/:token/order/:id/mark', async (req, res) => {
 app.get('/:token/user/order', async (req, res) => {
     // const { token } = req.cookies;
     const { token } = req.params;
-    let name;
+    let username;
 
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) { res.status(403).send(err); return; }
-        name = info.name;
+        username = info.username;
     });
-    res.json(await Order.find({ name }));
+    const orders = await Order.find({ username });
+    res.json(orders);
 })
 
 // notifiche
@@ -415,7 +420,7 @@ app.post('/:token/notification', multer().fields([]), async (req, res) => {
 
 app.put('/:token/:id/notification', async (req, res) => {
     // const { token } = req.cookies;
-    const { token,id } = req.params;
+    const { token, id } = req.params;
     let name;
 
     jwt.verify(token, secret, {}, (err, info) => {

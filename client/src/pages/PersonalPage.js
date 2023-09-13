@@ -82,9 +82,11 @@ export default function Personalpage() {
     }
 
     async function submitOrder(ev) {
+        setModal(false);
         let productsNames = formEl.map(f => f.selProd);
         let quantities = formEl.map(f => f.quantity);
         const jwt = localStorage.getItem('jwt')
+        
         const res = await fetch(ServerUrl.url+`/${jwt}/order`, {
             method: 'POST',
             body: JSON.stringify({ productsNames, quantities, desc }),

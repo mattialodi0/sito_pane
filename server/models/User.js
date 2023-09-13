@@ -6,6 +6,7 @@ const UserSchema = new Schema({
     password: {type:String, required:true},
     admin: Boolean,
     notifications:{type:[Object]},
+    stats:{type:Object}
 })  
 
 const UserModel = model('User', UserSchema);

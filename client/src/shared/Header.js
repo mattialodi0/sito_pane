@@ -13,18 +13,19 @@ export default function Header() {
 
     useEffect(() => {
         const jwt = localStorage.getItem('jwt')
-        fetch(ServerUrl.url + `/${jwt}/profile`, {
-            credentials: 'include',
-            method: 'GET'
-        }).then(
+        setTimeout(() => {
+            fetch(ServerUrl.url + `/${jwt}/profile`, {
+                credentials: 'include',
+                method: 'GET'
+            }).then(
             response => {
                 response.json().then(userInfo => {
                     setUserInfo(userInfo);
                 });
             }
-        );
-        if (userInfo.username) {
-            const jwt = localStorage.getItem('jwt')
+            );
+            if (userInfo.username) {
+                const jwt = localStorage.getItem('jwt')
             fetch(ServerUrl.url + `/${jwt}/notification/new`, {
                 credentials: 'include',
                 method: 'GET'
@@ -34,8 +35,9 @@ export default function Header() {
                         setNewNotifs(n);
                     });
                 }
-            );
-        }
+                );
+            }
+        }, 10)
     }, []);
 
     function logout() {
