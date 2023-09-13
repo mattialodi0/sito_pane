@@ -53,11 +53,13 @@ app.post('/login', async (req, res) => {
             // logged in
             jwt.sign({ username, id: userDoc._id, admin: userDoc.admin }, secret, {}, (err, token) => {
                 if (err) throw err;
-                // res.cookie('token', token)
-                res.setHeader('Set-Cookie',[`token=${token}`]).json({
-                    id: userDoc._id,
-                    username,
-                    admin: userDoc.admin,
+                res.cookie('token', token).json({   //res.setHeader('Set-Cookie',[`token=${token}`])
+                    info: {
+                        id: userDoc._id,
+                        username,
+                        admin: userDoc.admin,
+                    },
+                    jwt: token
                 });
             });
         } else {
@@ -407,7 +409,8 @@ app.put('/:id/notification', async (req, res) => {
 })
 
 app.get('/notification', async (req, res) => {
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.body;
     let name;
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) throw err;
@@ -422,7 +425,8 @@ app.get('/notification', async (req, res) => {
 })
 
 app.get('/notification/new', async (req, res) => {
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.body;
     let name;
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) res.status(400).json(err); //console.log(err); //throw err;

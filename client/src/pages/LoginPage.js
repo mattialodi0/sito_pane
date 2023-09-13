@@ -18,11 +18,12 @@ export default function IndexPage() {
             credentials: 'include'
         });
         if (res.status === 200) {
-            res.json().then(info => {
+            res.json().then(o => {
+                const {info, jwt} = o;
+                localStorage.setItem('jwt',jwt);
                 setUserInfo(info);
                 setRedirect(true);
             });
-            console.log(res.cookie);
         }
         else { alert('login failed') }
     }
