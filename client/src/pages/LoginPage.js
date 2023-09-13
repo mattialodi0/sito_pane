@@ -20,7 +20,7 @@ export default function IndexPage() {
         if (res.status === 200) {
             res.json().then(o => {
                 const {info, jwt} = o;
-                localStorage.setItem('jwt',jwt);
+                sessionStorage.setItem('jwt',jwt);
                 setUserInfo(info);
                 setRedirect(true);
             });

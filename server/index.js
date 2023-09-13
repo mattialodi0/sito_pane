@@ -19,7 +19,7 @@ const secret = 'sdfklknwaeivow2i4ofmwp30';
 
 //middleware
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app" }));  //http://localhost:3000  //https://sito-pane-app.vercel.app
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));  //https://sito-pane-app.vercel.app
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
@@ -52,7 +52,7 @@ app.post('/login', async (req, res) => {
         if (passOk) {
             // logged in
             jwt.sign({ username, id: userDoc._id, admin: userDoc.admin }, secret, {}, (err, token) => {
-                if (err) throw err;
+                if (err) { res.status(403).send(err); return; }
                 res.cookie('token', token).json({   //res.setHeader('Set-Cookie',[`token=${token}`])
                     info: {
                         id: userDoc._id,
@@ -68,20 +68,26 @@ app.post('/login', async (req, res) => {
     }
 });
 
-app.get('/profile', (req, res) => {
-    const { token } = req.cookies;
+app.get(':token/profile', (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) res.status(400).json(err); // console.log(err);   //throw err;
+        if (err) res.status(403).json(err); // console.log(err);   //throw err;
         else res.json(info);
     });
 });
 
-app.post('/logout', (req, res) => {
-    res.cookie('token', '').json('ok');
+app.post('/:token/logout', (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
+    jwt.verify(token, secret, {}, (err, info) => {
+        if (err) res.status(403).json(err); // console.log(err);   //throw err;
+        else res.cookie('token', '').json('ok');
+    });
 });
 
 // prodotti
-app.post('/product', uploadMiddleware.single('file'), async (req, res) => {
+app.post('/:token/product', uploadMiddleware.single('file'), async (req, res) => {
     if (req.file) {
         const { originalname, path } = req.file;
         const parts = originalname.split('.');
@@ -89,9 +95,10 @@ app.post('/product', uploadMiddleware.single('file'), async (req, res) => {
         const newPath = path + '.' + ext;
         fs.renameSync(path, newPath);
 
-        const { token } = req.cookies;
+        // const { token } = req.cookies;
+        const { token } = req.params;
         jwt.verify(token, secret, {}, async (err, info) => {
-            if (err) throw err;
+            if (err) { res.status(403).send(err); return; }
             const { name, desc, price, hidden } = req.body;
             try {
                 const productDoc = await Product.create({
@@ -108,9 +115,10 @@ app.post('/product', uploadMiddleware.single('file'), async (req, res) => {
         });
     }
     else {
-        const { token } = req.cookies;
+        // const { token } = req.cookies;
+        const { token } = req.params;
         jwt.verify(token, secret, {}, async (err, info) => {
-            if (err) throw err;
+            if (err) { res.status(403).send(err); return; }
             const { name, desc, price, url, hidden } = req.body;
             try {
                 const productDoc = await Product.create({
@@ -128,7 +136,7 @@ app.post('/product', uploadMiddleware.single('file'), async (req, res) => {
     }
 });
 
-app.put('/product', uploadMiddleware.single('file'), async (req, res) => {
+app.put('/:token/product', uploadMiddleware.single('file'), async (req, res) => {
     let newPath = null;
     if (req.file) {
         const { originalname, path } = req.file;
@@ -138,9 +146,11 @@ app.put('/product', uploadMiddleware.single('file'), async (req, res) => {
         fs.renameSync(path, newPath);
     }
 
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.params;
     jwt.verify(token, secret, {}, async (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
+
         const { name, desc, price, hidden } = req.body;
         const productDoc = await Product.findOne({ name: name });
         if (productDoc) {
@@ -169,9 +179,19 @@ app.get('/product/:name', async (req, res) => {
     res.json(productDoc);
 });
 
-app.delete('/product/:name', async (req, res) => {
+app.delete('/:token/product/:name', async (req, res) => {
     const { name } = req.params;
     //verifica dell'identità
+    jwt.verify(token, secret, {}, (err, info) => {
+        if (err) { 
+            res.status(403).json(err);
+            return;
+        }
+        if(!info.admin) 
+            res.status(400).json("l'utente non è un amminisratore");
+        username = info.username;
+    });
+
     const product = await Product.findOne({ name });
     try {
         fs.unlinkSync(product?.imgSrc);
@@ -187,12 +207,16 @@ app.delete('/product/:name', async (req, res) => {
 });
 
 // ordini
-app.post('/order', async (req, res) => {
+app.post('/:token/order', async (req, res) => {
     //verifica dell'identità
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.params;
     let username = '';
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) { throw err; }
+        if (err) { 
+            res.status(403).json(err);
+            return;
+        }
         username = info.username;
     });
 
@@ -232,13 +256,14 @@ app.post('/order', async (req, res) => {
     // }
 });
 
-app.get('/order', async (req, res) => {
+app.get('/:token/order', async (req, res) => {
     let a = false;
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.params;
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         if (!info.admin) {
-            res.status(400).json("l'utente non è un amminisratore");
+            res.status(403).json("l'utente non è un amminisratore");
         }
         else {
             a = true;
@@ -250,13 +275,15 @@ app.get('/order', async (req, res) => {
     }
 })
 
-app.get('/non-marked-order', async (req, res) => {
+app.get('/:token/non-marked-order', async (req, res) => {
     let a = false;
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.params;
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         if (!info.admin) {
-            res.status(400).json("l'utente non è un amminisratore");
+            res.status(403).json("l'utente non è un amminisratore");
         }
         else {
             a = true;
@@ -268,13 +295,15 @@ app.get('/non-marked-order', async (req, res) => {
     }
 })
 
-app.get('/marked-order', async (req, res) => {
+app.get('/:token/marked-order', async (req, res) => {
     let a = false;
-    const { token } = req.cookies;
+    // const { token } = req.cookies;
+    const { token } = req.params;
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         if (!info.admin) {
-            res.status(400).json("l'utente non è un amminisratore");
+            res.status(403).json("l'utente non è un amminisratore");
         }
         else {
             a = true;
@@ -286,11 +315,13 @@ app.get('/marked-order', async (req, res) => {
     }
 })
 
-app.delete('/order/:id', async (req, res) => {
-    const { token } = req.cookies;
+app.delete('/:token/order/:id', async (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
     const { id } = req.params;
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         if (!info.admin) {
             res.status(400).json("l'utente non è un amminisratore");
             return
@@ -300,11 +331,13 @@ app.delete('/order/:id', async (req, res) => {
     res.json(orders);
 })
 
-app.put('/order/:id/mark', async (req, res) => {
-    const { token } = req.cookies;
+app.put('/:token/order/:id/mark', async (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
     const { id } = req.params;
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         if (!info.admin) {
             res.status(400).json("l'utente non è un amminisratore");
             return
@@ -314,30 +347,32 @@ app.put('/order/:id/mark', async (req, res) => {
         let orders = await Order.findByIdAndUpdate({ _id: id }, { mark: true });
         res.json(orders);
     } catch (e) {
-        console.log(id);
         res.json(e);
     }
 })
 
-app.get('/user/order', async (req, res) => {
-    const { token } = req.cookies;
+app.get('/:token/user/order', async (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
     let name;
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         name = info.name;
     });
     res.json(await Order.find({ name }));
 })
 
 // notifiche
-app.post('/notification', multer().fields([]), async (req, res) => {
-    const { token } = req.cookies;
+app.post('/:token/notification', multer().fields([]), async (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
     const { title, content, dest } = req.body;
     const date = new Date();
     const id = Math.floor(Math.random() * 1000000000);
 
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         if (!info.admin) {
             res.status(400).json("l'utente non è un amminisratore");
             return
@@ -373,17 +408,17 @@ app.post('/notification', multer().fields([]), async (req, res) => {
             }
         }
     } catch (e) {
-        res.json(e);
+        res.status(500).json(e);
     }
 })
 
-app.put('/:id/notification', async (req, res) => {
-    const { token } = req.cookies;
-    const { id } = req.params;
+app.put('/:token/:id/notification', async (req, res) => {
+    // const { token } = req.cookies;
+    const { token,id } = req.params;
     let name;
 
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         name = info.username;
     });
     try {
@@ -408,13 +443,13 @@ app.put('/:id/notification', async (req, res) => {
     }
 })
 
-app.post('/notification', async (req, res) => {
+app.get('/:token/notification', async (req, res) => {
     // const { token } = req.cookies;
-    const { token } = req.body;
-    console.log(token);
+    const { token } = req.params;
     let name;
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) throw err;
+        if (err) { res.status(403).send(err); return; }
         name = info.username;
     });
     let user = await User.findOne({ username: name });
@@ -425,12 +460,13 @@ app.post('/notification', async (req, res) => {
         res.status(404).send();
 })
 
-app.post('/notification/new', async (req, res) => {
+app.get('/:token/notification/new', async (req, res) => {
     // const { token } = req.cookies;
-    const { token } = req.body;
+    const { token } = req.params;
     let name;
+
     jwt.verify(token, secret, {}, (err, info) => {
-        if (err) res.status(400).json(err); //console.log(err); //throw err;
+        if (err) { res.status(403).send(err); return; }
         name = info.username;
     });
     let user = await User.findOne({ username: name });

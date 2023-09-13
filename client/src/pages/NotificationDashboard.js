@@ -8,9 +8,10 @@ export default function NotificationDashboard() {
 
     useEffect(() => {
         if (admin) {
-            fetch(ServerUrl.url+`/profile`, { credentials: 'include' })
+            const jwt = sessionStorage.getItem('jwt')
+            fetch(ServerUrl.url+`/${jwt}/profile`, { credentials: 'include' })
                 .then(response => {
-                    if (response.status === 400) {
+                    if (response.status === 403) {
                         alert("Non sei un amministratore");
                         setAdmin(false);
                     }
@@ -34,8 +35,9 @@ export default function NotificationDashboard() {
             data.set('dest', 'all');
         else
             data.set('dest', newNotif.dest);
-
-        const res = await fetch(ServerUrl.url+"/notification", {
+        
+        const jwt = sessionStorage.getItem('jwt')
+        const res = await fetch(ServerUrl.url+'/'+jwt+"/notification", {
             method: 'POST',
             body: data,
             credentials: 'include'

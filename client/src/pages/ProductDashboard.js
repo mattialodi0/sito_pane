@@ -22,7 +22,8 @@ export default function ProductDashboard() {
 
     useEffect(() => {
         if (admin) {
-            fetch(ServerUrl.url+`/profile`, { credentials: 'include' })
+            const jwt = sessionStorage.getItem('jwt')
+            fetch(ServerUrl.url+`/${jwt}/profile`, { credentials: 'include' })
             .then(response => {
                 if (response.status === 400) {
                     alert("Non sei un amministratore");
@@ -46,7 +47,8 @@ export default function ProductDashboard() {
         data.set('url', urlc);
         data.set('hidden', false);
 
-        const res = await fetch(ServerUrl.url + "/product", {
+        const jwt = sessionStorage.getItem('jwt')
+        const res = await fetch(ServerUrl.url + `/${jwt}/product`, {
             method: 'POST',
             body: data,
             credentials: 'include'
@@ -78,7 +80,9 @@ export default function ProductDashboard() {
         if (fileu?.[0]) {
             data.set('file', fileu?.[0]);
         }
-        const response = await fetch(ServerUrl.url + '/product', {
+
+        const jwt = sessionStorage.getItem('jwt')
+        const response = await fetch(ServerUrl.url + `/${jwt}/product`, {
             method: 'PUT',
             body: data,
             credentials: 'include',
@@ -95,7 +99,8 @@ export default function ProductDashboard() {
     async function deleteProduct() {
         console.log('n:', named);
 
-        const response = await fetch(ServerUrl.url + `/product/${named}`, {
+        const jwt = sessionStorage.getItem('jwt')
+        const response = await fetch(ServerUrl.url + `/${jwt}/product/${named}`, {
             method: 'DELETE',
             credentials: 'include',
         });

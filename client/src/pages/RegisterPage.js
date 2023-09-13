@@ -27,12 +27,9 @@ export default function RegisterPage() {
         setUserInfo(info);
       });
     }
-    if (response.status === 200) {
-      alert('registration successful');
-      if(res.status === 200)
-        alert('login successful');
-
-      setRedirect(true);
+    if (response.status === 200 && res.status === 200) {
+        alert('registration successful');
+        setRedirect(true);
     } else {
       alert('registration failed');
     }

@@ -8,8 +8,8 @@ export default function NotificationPage() {
     const [notifsType, setNotifsType] = useState('notification/new');
 
     useEffect(() => {
-        const jwt = localStorage.getItem('jwt')
-        fetch(ServerUrl.url+`/${notifsType}`, { credentials: 'include', method: 'POST', body:JSON.stringify({jwt})})
+        const jwt = sessionStorage.getItem('jwt')
+        fetch(ServerUrl.url + `/${jwt}/${notifsType}`, { credentials: 'include' })
             .then(response => {
                 response.json().then(n => {
                     setNotifs(n);
@@ -18,14 +18,15 @@ export default function NotificationPage() {
     }, [notifsType])
 
     async function markAsRead(id) {
-        const response = await fetch(ServerUrl.url+`/${id}/notification`, {
+        const jwt = sessionStorage.getItem('jwt')
+        const response = await fetch(ServerUrl.url + `/${jwt}/${id}/notification`, {
             method: 'PUT',
             credentials: 'include',
         });
         if (response.ok) {
             window.location.reload(false);
         }
-        else    
+        else
             alert(`si è verificato un problema`);
     }
 
@@ -43,7 +44,7 @@ export default function NotificationPage() {
                     <p>Non ci sono notifiche</p>
                 )}
                 {notifs.length > 0 && notifs.map(n => (
-                    <Notification n={{id:n.id, title:n.title, content:n.content, date:n.date}} 
+                    <Notification n={{ id: n.id, title: n.title, content: n.content, date: n.date }}
                         markAsRead={markAsRead} btnOn={notifsType == 'notification/new'} key={notifs.indexOf(n)} />
                 ))}
             </div>

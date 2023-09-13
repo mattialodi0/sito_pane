@@ -21,7 +21,8 @@ export default function OrderDashboard() {
     }, [orderStatus]);
 
     function retriveOrders() {
-        fetch(ServerUrl.url + `/${orderStatus}`, { credentials: 'include' })
+        const jwt = sessionStorage.getItem('jwt')
+        fetch(ServerUrl.url + `/${jwt}/${orderStatus}`, { credentials: 'include' })
             .then(response => {
                 if (response.status === 400) {
                     alert("Non sei un amministratore");
@@ -39,8 +40,8 @@ export default function OrderDashboard() {
     async function deleteOrder(ev) {
         ev.preventDefault();
         setOrderModal(false);
-
-        const response = await fetch(ServerUrl.url + `/order/${delElId}`, {
+        const jwt = sessionStorage.getItem('jwt')
+        const response = await fetch(ServerUrl.url + `/${jwt}/order/${delElId}`, {
             method: 'DELETE',
             credentials: 'include',
         });
@@ -54,8 +55,8 @@ export default function OrderDashboard() {
     async function markOrder(ev, id) {
         ev.preventDefault();
         setOrderModal(false);
-        
-        const response = await fetch(ServerUrl.url + `/order/${id}/mark`, {
+        const jwt = sessionStorage.getItem('jwt')
+        const response = await fetch(ServerUrl.url + `/${jwt}/order/${id}/mark`, {
             method: 'PUT',
             credentials: 'include',
         });
