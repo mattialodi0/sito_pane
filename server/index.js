@@ -408,7 +408,7 @@ app.put('/:id/notification', async (req, res) => {
     }
 })
 
-app.get('/notification', async (req, res) => {
+app.post('/notification', async (req, res) => {
     // const { token } = req.cookies;
     const { token } = req.body;
     let name;
@@ -424,7 +424,7 @@ app.get('/notification', async (req, res) => {
         res.status(404).send();
 })
 
-app.get('/notification/new', async (req, res) => {
+app.post('/notification/new', async (req, res) => {
     // const { token } = req.cookies;
     const { token } = req.body;
     let name;
