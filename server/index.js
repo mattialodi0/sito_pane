@@ -411,6 +411,7 @@ app.put('/:id/notification', async (req, res) => {
 app.post('/notification', async (req, res) => {
     // const { token } = req.cookies;
     const { token } = req.body;
+    console.log(token);
     let name;
     jwt.verify(token, secret, {}, (err, info) => {
         if (err) throw err;

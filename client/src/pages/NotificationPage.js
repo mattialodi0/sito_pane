@@ -9,7 +9,7 @@ export default function NotificationPage() {
 
     useEffect(() => {
         const jwt = localStorage.getItem('token')
-        fetch(ServerUrl.url+`/${notifsType}`, { credentials: 'include', method: 'POST', body:{jwt}})
+        fetch(ServerUrl.url+`/${notifsType}`, { credentials: 'include', method: 'POST', body:JSON.stringify({jwt})})
             .then(response => {
                 response.json().then(n => {
                     setNotifs(n);
