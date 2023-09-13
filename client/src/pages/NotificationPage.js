@@ -8,7 +8,7 @@ export default function NotificationPage() {
     const [notifsType, setNotifsType] = useState('notification/new');
 
     useEffect(() => {
-        const jwt = localStorage.getItem('token')
+        const jwt = localStorage.getItem('jwt')
         fetch(ServerUrl.url+`/${notifsType}`, { credentials: 'include', method: 'POST', body:JSON.stringify({jwt})})
             .then(response => {
                 response.json().then(n => {
