@@ -19,7 +19,7 @@ const secret = 'sdfklknwaeivow2i4ofmwp30';
 
 //middleware
 app.use(express.json());
-app.use(cors({ credentials: true, origin: "https://sito-pane-app.web.app" }));  //http://localhost:3000  //https://sito-pane-app.vercel.app
+app.use(cors({ credentials: true, origin: "https://sito-pane-app.vercel.app" }));  //http://localhost:3000  //https://sito-pane-app.vercel.app
 app.use(cookieParser());
 app.use('/uploads', express.static(__dirname + '/uploads'));
 
