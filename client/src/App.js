@@ -5,12 +5,14 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import PersonalPage from './pages/PersonalPage';
 // import AdminPage from './pages/AdminPage';
+import OrderPage from './pages/OrderPage';
 import NotificationPage from './pages/NotificationPage';
 import ProductDashboard from './pages/ProductDashboard';
 import OrderDashboard from './pages/OrderDashboard';
 import NotificationDashboard from './pages/NotificationDashboard';
+import { useEffect } from 'react';
 
-function App() {  
+function App() {
   return (
     <UserContextProvider>
       <Routes>
@@ -19,6 +21,7 @@ function App() {
           <Route path={'/login'} element={<LoginPage />} />
           <Route path={'/register'} element={<RegisterPage />} />
           <Route path={'/personal'} element={<PersonalPage />} />
+          <Route path={'/orders'} element={<OrderPage />} />
           <Route path={'/notifications'} element={<NotificationPage />} />
           {/* <Route path={'/dashboard'} element={<AdminPage />}> */}
           <Route path={'/dashboard'}>

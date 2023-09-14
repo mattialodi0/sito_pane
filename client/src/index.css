@@ -11,7 +11,8 @@
   /* titles */
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     @apply text-primary text-center font-bold;
   }
 
@@ -25,6 +26,10 @@
 
   h3 {
     @apply m-3 text-3xl;
+  }
+
+  h4 {
+    @apply m-1 text-xl;
   }
 
   /* header */
@@ -54,6 +59,10 @@
   header .btn-register,
   header .btn-logout {
     @apply my-5 px-2 py-1 text-primary border border-primary rounded-md;
+  }
+
+  header .personal {
+    @apply my-5 px-2 py-1 text-primary font-semibold underline underline-offset-2;
   }
 
   /*form */

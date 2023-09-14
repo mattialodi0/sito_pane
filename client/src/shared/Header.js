@@ -13,28 +13,26 @@ export default function Header() {
 
     useEffect(() => {
         const jwt = localStorage.getItem('jwt')
-        setTimeout(() => {
-            fetch(ServerUrl.url + `/${jwt}/profile`, {
+        setTimeout(async () => {
+            const res = await fetch(ServerUrl.url + `/${jwt}/profile`, {
                 credentials: 'include',
                 method: 'GET'
-            }).then(
-            response => {
-                response.json().then(userInfo => {
+            });
+            if (res.status === 200)
+                res.json().then(userInfo => {
                     setUserInfo(userInfo);
                 });
-            }
-            );
-            if (userInfo.username) {
+            if (userInfo?.username) {
                 const jwt = localStorage.getItem('jwt')
-            fetch(ServerUrl.url + `/${jwt}/notification/new`, {
-                credentials: 'include',
-                method: 'GET'
-            }).then(
-                response => {
-                    response.json().then(n => {
-                        setNewNotifs(n);
-                    });
-                }
+                fetch(ServerUrl.url + `/${jwt}/notification/new`, {
+                    credentials: 'include',
+                    method: 'GET'
+                }).then(
+                    response => {
+                        response.json().then(n => {
+                            setNewNotifs(n);
+                        });
+                    }
                 );
             }
         }, 10)
@@ -89,7 +87,7 @@ export default function Header() {
                                 </span>
                             )}
                         </span>
-                        <Link to="/personal" className={`orders ${admin ? "font-normal" : "font-semibold"}`}>ordini</Link>
+                        <Link to="/orders" className={`orders ${admin ? "font-normal" : "font-semibold"}`}>ordini</Link>
                         {admin && (
                             <select className="mx-auto p-1 text-center text-primary font-semibold rounded-md bg-secondary"
                                 onChange={e => gotoDashboard(e.target.value)} value={selectState}>
@@ -105,8 +103,8 @@ export default function Header() {
             <nav>
                 {username && (
                     <>
-                        <a href='/' onClick={logout} className="btn-logout">Logout</a>
-                        {/* <Link to="/" onClick={logout} className="btn-logout">Logout</Link> */}
+                        <Link to="/personal" className="personal">{ (userInfo || {}).username? userInfo.username : 'profilo' }</Link>
+                        <Link to="/" onClick={logout} className="btn-logout">Logout</Link>
                     </>
                 )}
                 {!username && (

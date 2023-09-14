@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import Header from '../shared/Header';
+import DefaultModal from '../shared/DefaultModal';
 import ServerUrl from "../shared/ServerUrl";
 
 export default function NotificationDashboard() {
     const [ admin, setAdmin ] = useState(true);
     const [ newNotif, setNewNotif ] = useState({title:"", content:"", dest:""});
+    const [ deleteTitle, setDeleteTitle ] = useState('');
 
     useEffect(() => {
         if (admin) {
@@ -75,6 +77,19 @@ export default function NotificationDashboard() {
         return v;
     }
 
+    async function deleteNotif() {
+        const jwt = localStorage.getItem('jwt')
+        const response = await fetch(ServerUrl.url + `/${jwt}/notification/${deleteTitle}`, {
+            method: 'DELETE',
+            credentials: 'include',
+        });
+        const j = await response.json();
+        if (response.ok) {
+            alert("notifica eliminata con successo");
+            setDeleteTitle('');
+        }
+    }
+
     return (
         <>
             <Header />
@@ -95,6 +110,19 @@ export default function NotificationDashboard() {
                     />
 
                     <button className="w-1/2 m-auto">invia</button>
+                </div>
+            </form>
+            <form onSubmit={ev => {ev.preventDefault(); deleteNotif();}} className="md:w-1/3 mx-auto">
+                <h3>Rimuovi una notifica</h3>
+                <div className="flex flex-col">
+                    <input
+                            type="text"
+                            placeholder="titolo"
+                            className="mx-auto w-[303.2px]"
+                            value={deleteTitle}
+                            onChange={ev => {setDeleteTitle(ev.target.value); }}
+                        />
+                    <button className="w-1/2 mx-auto">cancella</button> 
                 </div>
             </form>
         </>

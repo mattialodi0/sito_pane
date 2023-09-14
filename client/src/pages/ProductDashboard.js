@@ -15,6 +15,7 @@ export default function ProductDashboard() {
     const [descu, setDescu] = useState('');
     const [priceu, setPriceu] = useState('');
     const [fileu, setFileu] = useState('');
+    const [urlu, setUrlu] = useState('');
     const [named, setNamed] = useState('');
 
     const [admin, setAdmin] = useState(true);
@@ -59,6 +60,7 @@ export default function ProductDashboard() {
             setDescc('');
             setPricec('');
             setFilec('');
+            setUrlc('');
         }
     }
 
@@ -80,6 +82,9 @@ export default function ProductDashboard() {
         if (fileu?.[0]) {
             data.set('file', fileu?.[0]);
         }
+        if(urlu) {
+            data.set('url', urlu);
+        }
 
         const jwt = localStorage.getItem('jwt')
         const response = await fetch(ServerUrl.url + `/${jwt}/product`, {
@@ -93,6 +98,7 @@ export default function ProductDashboard() {
             setDescu('');
             setPriceu('');
             setFileu('');
+            setUrlu('');
         }
     }
 
@@ -113,10 +119,11 @@ export default function ProductDashboard() {
         setProdModal(false);
     }
 
-    return (
+    if(!admin)
+        return (<Navigate to="/" />)
+    else
+        return (
         <>
-            {!admin && <Navigate to="/" />}
-
             <Header />
 
             <h1>Cambia i prodotti</h1>
@@ -139,6 +146,7 @@ export default function ProductDashboard() {
                         onChange={ev => setFilec(ev.target.files)}
                     />
                     <input type="text" placeholder="url" className="bg-white"
+                        value={urlc} 
                         onChange={ev => setUrlc(ev.target.value)}
                     />
                     <button className="w-1/2 m-auto">aggiungi</button>
@@ -164,6 +172,10 @@ export default function ProductDashboard() {
                     <input type="file" placeholder="immagine" className="bg-white"
                         onChange={ev => setFileu(ev.target.files)}
                     />
+                    <input type="text" placeholder="url" className="bg-white"
+                        value={urlu} 
+                        onChange={ev => setUrlu(ev.target.value)}
+                    />
                     <button className="w-1/2 m-auto">modifica</button>
                 </div>
             </form>
@@ -180,7 +192,6 @@ export default function ProductDashboard() {
                     <button className="w-1/2 mx-auto">cancella</button> 
                 </div>
             </form>
-
             {prodModal && (<DefaultModal content={(
                 <div>
                     <p className="text-base leading-relaxed text-gray-800 dark:text-gray-200">Vuoi davvero cancellare questo prodotto?</p>

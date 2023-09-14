@@ -30,7 +30,7 @@ app.use('/uploads', express.static(__dirname + '/uploads'));
 mongoose.connect('mongodb+srv://mattyk0207:DChcpihwwYP1HVAm@cluster0.gwi3na7.mongodb.net/');
 
 
-// login & register
+// utenti
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
@@ -39,7 +39,7 @@ app.post('/register', async (req, res) => {
             username,
             password: bcrypt.hashSync(password, salt),
             admin: "false",
-            notifications: [ functions.welcomeMessage(username) ],
+            notifications: [functions.welcomeMessage(username)],
             stats: functions.createStats()
         });
         res.json(userDoc);
@@ -90,6 +90,23 @@ app.post('/:token/logout', (req, res) => {
         else res.cookie('token', '').json('ok');
     });
 });
+
+// statistiche
+app.get('/:token/user/stats', async (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
+    let username;
+
+    jwt.verify(token, secret, {}, (err, info) => {
+        if (err) { res.status(403).send(err); return; }
+        username = info.username;
+    });
+    const stats = await User.findOne({ username }, { stats: true, _id: false });
+    if (stats)
+        res.json(stats.stats);
+    else
+        res.status(404).send();
+})
 
 // prodotti
 app.post('/:token/product', uploadMiddleware.single('file'), async (req, res) => {
@@ -149,27 +166,49 @@ app.put('/:token/product', uploadMiddleware.single('file'), async (req, res) => 
         const ext = parts[parts.length - 1];
         newPath = path + '.' + ext;
         fs.renameSync(path, newPath);
+
+        // const { token } = req.cookies;
+        const { token } = req.params;
+        jwt.verify(token, secret, {}, async (err, info) => {
+            if (err) { res.status(403).send(err); return; }
+
+            const { name, desc, price, hidden } = req.body;
+            const productDoc = await Product.findOne({ name: name });
+            if (productDoc) {
+                await Product.updateOne({ name: name }, {
+                    desc: desc ? desc : productDoc.desc,
+                    price: price ? price : productDoc.price,
+                    imgSrc: newPath ? newPath : productDoc.imgSrc,
+                    hidden: productDoc.hidden,  //hidden ? hidden :  per ora la visibilità non è settabile
+                });
+                res.json(productDoc);
+            }
+            else
+                res.status(400).json(`${name} non è un prodotto esistente`);
+        });
     }
+    else {
+        // const { token } = req.cookies;
+        const { token } = req.params;
+        jwt.verify(token, secret, {}, async (err, info) => {
+            if (err) { res.status(403).send(err); return; }
+    
+            const { name, desc, price, url, hidden } = req.body;
+            const productDoc = await Product.findOne({ name: name });
+            if (productDoc) {
+                await Product.updateOne({ name: name }, {
+                    desc: desc ? desc : productDoc.desc,
+                    price: price ? price : productDoc.price,
+                    imgUrl: url ? url : productDoc.url,
+                    hidden: productDoc.hidden,  //hidden ? hidden :  per ora la visibilità non è settabile
+                });
+                res.json(productDoc);
+            }
+            else
+                res.status(400).json(`${name} non è un prodotto esistente`);
+        });
 
-    // const { token } = req.cookies;
-    const { token } = req.params;
-    jwt.verify(token, secret, {}, async (err, info) => {
-        if (err) { res.status(403).send(err); return; }
-
-        const { name, desc, price, hidden } = req.body;
-        const productDoc = await Product.findOne({ name: name });
-        if (productDoc) {
-            await Product.updateOne({ name: name }, {
-                desc: desc ? desc : productDoc.desc,
-                price: price ? price : productDoc.price,
-                imgSrc: newPath ? newPath : productDoc.imgSrc,
-                hidden: productDoc.hidden,  //hidden ? hidden :  per ora la visibilità non è settabile
-            });
-            res.json(productDoc);
-        }
-        else
-            res.status(400).json(`${name} non è un prodotto esistente`);
-    });
+    }
 
 });
 
@@ -231,34 +270,34 @@ app.post('/:token/order', async (req, res) => {
     let prices = [];
     let q = [];
     let n = [];
-    let Products = await Product.find();
-    Products.forEach(p => {
-        productsNames.forEach(pn => {
-            if (p.name === pn) {
-                products.push(p);
-                prices.push(p.price);
-                q.push(quantities[productsNames.indexOf(pn)]);
-                n.push(productsNames[productsNames.indexOf(pn)]);
-            }
-            // console.log(p);
-        })
-    });
-    // try {
-    const oderDoc = await Order.create({
-        username,
-        products,
-        productNames: n,
-        quantities: q,
-        prices,
-        desc,
-        date,
-        mark: false,
-    });
-    res.json(oderDoc);
-    // } catch (e) {
-    //     console.log(e);
-    //     res.status(400).json(e);
-    // }
+    try {
+        let Products = await Product.find();
+        Products.forEach(p => {
+            productsNames.forEach(pn => {
+                if (p.name === pn) {
+                    products.push(p);
+                    prices.push(p.price);
+                    q.push(quantities[productsNames.indexOf(pn)]);
+                    n.push(productsNames[productsNames.indexOf(pn)]);
+                }
+                // console.log(p);
+            })
+        });
+        const userDoc = await User.updateOne({ username }, { $inc: { 'stats.orders': 1 } });
+        const oderDoc = await Order.create({
+            username,
+            products,
+            productNames: n,
+            quantities: q,
+            prices,
+            desc,
+            date,
+            mark: false,
+        });
+        res.json(oderDoc);
+    } catch (e) {
+        res.status(500).json(e);
+    }
 });
 
 app.get('/:token/order', async (req, res) => {
@@ -349,10 +388,11 @@ app.put('/:token/order/:id/mark', async (req, res) => {
         }
     });
     try {
-        let orders = await Order.findByIdAndUpdate({ _id: id }, { mark: true });
-        res.json(orders);
+        let order = await Order.findOneAndUpdate({ _id: id }, { mark: true });
+        const userDoc = await User.updateOne({ username: order?.username }, { $inc: { 'stats.completedOrders': 1 } });
+        res.json(order);
     } catch (e) {
-        res.json(e);
+        res.status(500).json(e);
     }
 })
 
@@ -484,6 +524,26 @@ app.get('/:token/notification/new', async (req, res) => {
     }
     else
         res.status(404).send();
+})
+
+app.delete('/:token/notification/:title', async (req, res) => {
+    // const { token } = req.cookies;
+    const { token } = req.params;
+    const { title } = req.params;
+
+    jwt.verify(token, secret, {}, (err, info) => {
+        if (err) { res.status(403).send(err); return; }
+        if (!info.admin) {
+            res.status(400).json("l'utente non è un amminisratore");
+            return
+        }
+    });
+    try {
+        let users = await User.updateMany({}, { '$pull': { 'notifications': { 'title': title } } });
+        res.json(users);
+    } catch (e) {
+        res.status(500).json(e);
+    }
 })
 
 app.listen(4000, () => { console.log("listening on http://localhost:4000") });
