@@ -80,7 +80,7 @@ export default function OrderDashboard() {
                     <option className="hover:bg-primary" value={'non-marked-order'}>{'non evasi'}</option>
                     <option className="hover:bg-primary" value={'marked-order'}>{'solo evasi'}</option>
                 </select>
-                <div className="md:w-1/2 mx-auto">
+                <div className="md:w-3/5 mx-auto">
                     <OrderList order={orders} deleteOrder={(e,id) => {setOrderModal(true); setDelElId(id)}} markOrder={markOrder} />
                     {orderModal && (<DefaultModal content={(
                         <div>

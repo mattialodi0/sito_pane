@@ -62,6 +62,8 @@ export default function ProductDashboard() {
             setFilec('');
             setUrlc('');
         }
+        else    
+            alert('non è stato possibile modificare il prodotto')
     }
 
     async function updateProduct(ev) {
@@ -99,7 +101,9 @@ export default function ProductDashboard() {
             setPriceu('');
             setFileu('');
             setUrlu('');
-        }
+        } 
+        else    
+            alert('non è stato possibile modificare il prodotto')
     }
 
     async function deleteProduct() {

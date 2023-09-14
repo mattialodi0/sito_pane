@@ -37,7 +37,7 @@ export default function OrderPage() {
     function addFormEl() {
         if (formEl.length < 5) {
             setFormEl(currFormEl => {
-                return [...currFormEl, { id: crypto.randomUUID() }]
+                return [...currFormEl, { id: crypto.randomUUID(), selProd: "", quantity: 1 }]
             })
         }
         else alert('Non è possibile ordinare più di 5 articoli alla volta');

@@ -25,7 +25,7 @@ export default function IndexPage() {
                 setRedirect(true);
             });
         }
-        else { alert('login failed') }
+        else alert('il login è fallito')
     }
 
     if (redirect) {

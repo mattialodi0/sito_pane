@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import React from "react";
 
 export default function FormEl({ id, products, deleteFormEl, changeSelProd, changeSelQuantity }) {
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState(0);
     const [product, setProduct] = useState('');
     const [price, setPrice] = useState(' ');
 
@@ -48,7 +48,7 @@ export default function FormEl({ id, products, deleteFormEl, changeSelProd, chan
                 <label htmlFor={`price-${id}`}>prezzo</label>
                 <input type="text" disabled color="primary"
                     id={`price-${id}`}
-                    value={quantity * price + '$'}
+                    value={quantity * price + '€'}
                     className=""
                 />
             </div>

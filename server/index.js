@@ -70,6 +70,8 @@ app.post('/login', async (req, res) => {
         } else {
             res.status(400).json('wrong credentials');
         }
+    }else {
+        res.status(400).json('wrong credentials');
     }
 });
 
