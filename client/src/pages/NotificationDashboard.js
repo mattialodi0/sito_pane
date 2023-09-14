@@ -93,6 +93,8 @@ export default function NotificationDashboard() {
     return (
         <>
             <Header />
+
+            <h1>Cambia le notifiche</h1>
             <form onSubmit={createNotification}>
                 <h3>Invia una notifica</h3>
                 <div className="flex flex-col md:w-1/3 mx-auto px-2">
