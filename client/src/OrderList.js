@@ -12,7 +12,7 @@ export default function OrderList(props) {
                 <p className="my-5 mx-auto">Non ci sono ancora ordini</p>
             )}
             {orders.length !== 0 && (
-                <div className="grid grid-cols-1 md:flex md:flex-wrap">
+                <div className="grid grid-cols-1 md:flex md:justify-evenly md:flex-wrap">
                     {orders.map(el => {
                         return (
                             <div className="card m-5" key={`card ${orders.indexOf(el)}`}>

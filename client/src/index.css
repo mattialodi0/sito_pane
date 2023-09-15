@@ -77,7 +77,7 @@
 
   form input,
   form select {
-    @apply m-1 p-1 border bg-secondary border-primary rounded-md;
+    @apply mx-3 md:m-1 p-1 border bg-secondary border-primary rounded-md;
   }
 
   form button {
@@ -90,6 +90,10 @@
 
   .btn-full {
     @apply my-5 px-2 py-1 text-white border border-primary rounded-md bg-primary hover:bg-primary-dark;
+  }
+
+  label {
+    @apply ml-3 md:ml-1;
   }
 
   /* personal page */
