@@ -180,10 +180,18 @@ export default function ProductDashboard() {
                     <h3>Modifica un prodotto</h3>
                     <div className="flex flex-col">
                         <label htmlFor="name-to-change">elemento da modificare </label>
-                        <input type="text" placeholder="nome" required id="name-to-change"
+                        {/* <input type="text" placeholder="nome" required id="name-to-change"
                             value={nameu}
                             onChange={ev => setNameu(ev.target.value)}
-                        />
+                        /> */}
+                        <select value={nameu} onChange={e => { setNameu(e.target.value); }}
+                            className="mx-3 md:m-1 p-1 border border-primary rounded-md bg-secondary">
+                            {products.map(prod => {
+                                return (
+                                    <option className="hover:bg-primary" value={prod.name} key={products.indexOf(prod)}>{prod.name}</option>
+                                )
+                            })}
+                        </select>
                         <p className="ml-3 md:ml-1">nuovi parametri</p>
                         <input type="text" placeholder="prezzo in €/kg"
                             value={priceu}
@@ -213,7 +221,7 @@ export default function ProductDashboard() {
                             value={named}
                             onChange={ev => {setNamed(ev.target.value); }}
                         /> */}
-                        <ReactSearchAutocomplete
+                        {/* <ReactSearchAutocomplete
                             items={products}
                             onSelect={item => { setNamed(item.name) }}
                             formatResult={formatResult}
@@ -228,8 +236,18 @@ export default function ProductDashboard() {
                                 placeholderColor: "ligth-grey",
                                 focusBackroundColor: "#fffacd",
                             }}
+                            showIcon={false}
                             placeholder="nome"
-                        />
+                            id="name-to-delete"
+                        /> */}
+                        <select value={named} onChange={e => { setNamed(e.target.value); }}
+                            className="mx-3 md:m-1 p-1 border border-primary rounded-md bg-secondary">
+                            {products.map(prod => {
+                                return (
+                                    <option className="hover:bg-primary" value={prod.name} key={products.indexOf(prod)}>{prod.name}</option>
+                                )
+                            })}
+                        </select>
                         <button className="w-1/2 mx-auto">cancella</button>
                     </div>
                 </form>

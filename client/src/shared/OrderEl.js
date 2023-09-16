@@ -1,6 +1,6 @@
 import { formatISO9075 } from 'date-fns';
 
-export default function OrderEl({ username, productNames, quantities, prices, desc, date, _id, admin = false}) {
+export default function OrderEl({ username, productNames, quantities, prices, desc, date, _id, k, admin = false}) {
     function total(prices) {
         let sum = 0;
         for (let i = 0; i < prices.length; i++) {
@@ -10,7 +10,7 @@ export default function OrderEl({ username, productNames, quantities, prices, de
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full" key={k}>
             <h4 className="font-semibold text-lg text-primary">ordine n. {_id}:</h4>
             {admin === true && (
                 <p>cliente: {username}</p>

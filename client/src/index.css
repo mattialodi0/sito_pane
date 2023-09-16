@@ -77,7 +77,7 @@
 
   form input,
   form select {
-    @apply mx-3 md:m-1 p-1 border bg-secondary border-primary rounded-md;
+    @apply mx-3 my-1 md:m-1 p-1 border bg-secondary border-primary rounded-md;
   }
 
   form button {
