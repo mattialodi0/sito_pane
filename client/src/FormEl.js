@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import React from "react";
 
-export default function FormEl({ id, products, deleteFormEl, changeSelProd, changeSelQuantity }) {
-    const [quantity, setQuantity] = useState(0);
-    const [product, setProduct] = useState('');
+export default function FormEl({ id, q, prod, products, deleteFormEl, changeSelProd, changeSelQuantity }) {
+    const [quantity, setQuantity] = useState(q||1);
+    const [product, setProduct] = useState(prod||'');
     const [price, setPrice] = useState(' ');
 
     return (
-        <div className="flex flex-col   md:grid md:grid-cols-5 md:w-1/2 m-2 gap-4">
+        <div className="flex flex-col  md:grid md:grid-cols-5 md:w-1/2 m-2 gap-4">
             <div className="flex flex-col col-span-2">
                 <label htmlFor={`product-${id}`}>prodotto</label>
                 <select

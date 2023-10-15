@@ -8,8 +8,9 @@ import DefaultModal from "../shared/DefaultModal";
 import ServerUrl from "../shared/ServerUrl";
 
 export default function OrderPage() {
+    const [n, setN] = useState(1);
     const [orders, setOrders] = useState([]);
-    const [formEl, setFormEl] = useState([{ id: crypto.randomUUID(), selProd: "", quantity: 1 }]);
+    const [formEl, setFormEl] = useState([{ id: 0, selProd: "", quantity: 1 }]);  // Math.floor(Math.random()*1000)
     const [desc, setDesc] = useState('');
     const [products, setProducts] = useState([]);
 
@@ -37,17 +38,17 @@ export default function OrderPage() {
     function addFormEl() {
         if (formEl.length < 5) {
             setFormEl(currFormEl => {
-                return [...currFormEl, { id: crypto.randomUUID(), selProd: "", quantity: 1 }]
+                setN(a => a+1);
+                return [...currFormEl, { id: n, selProd: "", quantity: 1 }]
             })
         }
         else alert('Non è possibile ordinare più di 5 articoli alla volta');
     }
 
     function deleteFormEl(id) {
+        console.log(formEl)
         if (formEl.length > 1)
-            setFormEl(currFormEl => {
-                return currFormEl.filter(el => el.id !== id);
-            })
+            setFormEl(currFormEl => currFormEl.filter(el => el.id !== id).sort((a,b) => (a.id > b.id)?1:-1))
         else alert('Non è possibile effettuare ordini vuoti');
     }
 
@@ -56,7 +57,8 @@ export default function OrderPage() {
             let els = currFormEls.filter(el => el.id !== id);
             let currEl = currFormEls.filter(el => el.id === id);
             currEl[0].selProd = value;
-            return [...els, currEl[0]];
+            let arr = [...els, currEl[0]];
+            return arr.sort((a,b) => (a.id > b.id)?1:-1);
         })
     }
 
@@ -65,7 +67,8 @@ export default function OrderPage() {
             let els = currFormEls.filter(el => el.id !== id);
             let currEl = currFormEls.filter(el => el.id === id);
             currEl[0].quantity = value;
-            return [...els, currEl[0]];
+            let arr = [...els, currEl[0]];
+            return arr.sort((a,b) => (a.id > b.id)?1:-1);
         })
     }
 
@@ -118,8 +121,8 @@ export default function OrderPage() {
                             </div>
                             {formEl.map(el => {
                                 return (
-                                    <FormEl {...el} products={products} deleteFormEl={deleteFormEl}
-                                        changeSelProd={changeSelProd} changeSelQuantity={changeSelQuantity} key={formEl.indexOf(el)}
+                                    <FormEl id={el.id} q={el.quantity} prod={el.selProd} products={products} key={formEl.indexOf(el)}
+                                    deleteFormEl={deleteFormEl} changeSelProd={changeSelProd} changeSelQuantity={changeSelQuantity} 
                                     />
                                 )
                             })}
